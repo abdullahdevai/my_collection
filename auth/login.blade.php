@@ -6,26 +6,25 @@
             </a>
         </x-slot>
 
-        <!-- Session Status -->
-        {{-- <x-auth-session-status class="mb-4" :status="session('status')" /> --}}
-
-        <form method="POST" action="{{ route('login') }}">
+        <form method="POST" action="{{ route('login') }}" x-data="loginForm()">
             @csrf
 
             <!-- Email Address -->
             <div>
                 <x-label for="email" :value="__('Email')" />
-
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required
-                    autofocus />
+                <x-input id="email" class="block mt-1 w-full" type="email" name="email" x-model="email" required autofocus />
+                <p class="text-red-500 text-sm mt-1" x-show="email && !validEmail" x-cloak>
+                    Please enter a valid email.
+                </p>
             </div>
 
             <!-- Password -->
-            <div class="mt-4">
+            <div class="mt-4 relative">
                 <x-label for="password" :value="__('Password')" />
-
-                <x-input id="password" class="block mt-1 w-full" type="password" name="password" required
-                    autocomplete="current-password" />
+                <x-input id="password" class="block mt-1 w-full" type="password" name="password" x-model="password" required />
+                <p class="text-red-500 text-sm mt-1" x-show="password === '' && attempted" x-cloak>
+                    Password cannot be empty.
+                </p>
             </div>
 
             <!-- Remember Me -->
@@ -38,19 +37,38 @@
                 </label>
             </div>
 
-            <div class="flex items
-                -center justify-end mt-4">
+            <div class="flex items-center justify-end mt-4">
                 @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900"
-                        href="{{ route('password.request') }}">
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
                         {{ __('Forgot your password?') }}
                     </a>
                 @endif
 
-                <x-button type="submit" class="ml-4">
+                <x-button type="submit" class="ml-4" :disabled="!canSubmit">
                     {{ __('Log in') }}
                 </x-button>
             </div>
         </form>
     </x-auth-card>
+
+    <script>
+        function loginForm() {
+            return {
+                email: '',
+                password: '',
+                attempted: false,
+
+                // Email validation
+                get validEmail() {
+                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email);
+                },
+
+                // Can submit if email valid and password not empty
+                get canSubmit() {
+                    this.attempted = this.email !== '' || this.password !== '';
+                    return this.validEmail && this.password.length > 0;
+                }
+            }
+        }
+    </script>
 </x-guest-layout>
