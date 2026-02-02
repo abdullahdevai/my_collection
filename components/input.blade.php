@@ -1,6 +1,11 @@
-<input
-    {{ $attributes->merge([
-        'class' => 'w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm
-                    focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500
-                    dark:border-zinc-700 dark:bg-zinc-900',
-    ]) }} />
+
+<div>
+    <div class="form-group">
+        <input type="{{ $type }}" id="{{ $name }}" name="{{ $name }}" class="form-control input-default @error($name) is-invalid @enderror"
+            placeholder="{{ $placeholder }}" value="{{ $value ? $value : old($name) }}" {{ $attributes }}>
+        @error($name)
+            <span class="text-danger">{{ $message }}</span>
+        @enderror
+    </div>
+</div>
+
